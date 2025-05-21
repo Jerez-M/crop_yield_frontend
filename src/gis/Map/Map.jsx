@@ -17,7 +17,7 @@ const Map = () => {
   const [radiusFilter, setRadiusFilter] = useState(null);
   const [geoFilter, setGeoFilter] = useState(null);
 
-  const positionMadiun = [-7.629900, 111.517113];
+  // Removing unused positionMadiun variable
   const positionRomania = [45.943161, 24.966761];
 
   const getRadiusFilter = () => radiusFilter;

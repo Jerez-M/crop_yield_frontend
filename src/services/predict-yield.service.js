@@ -1,26 +1,31 @@
-import instance from "../http-common";
+import http from "../http-common";
 
 class PredictYieldService {
-    create(data) {
-        return instance.post(`/predictions/`, data);
-    }
+  predict(data) {
+    return http.post("/predict", data);
+  }
 
-    predict(data) {
-        return instance.post(`/predictions/predict/`, data);
-    }
+  getAllPredictions() {
+    return http.get("/predictions");
+  }
 
-    getById(id) {
-        return instance.get(`/predictions/${id}/`);
-    }
+  getPrediction(id) {
+    return http.get(`/predictions/${id}`);
+  }
 
-    update(id, data) {
-        return instance.put(`/predictions/update/${id}/`, data);
-    }
+  createPrediction(data) {
+    return http.post("/predictions", data);
+  }
 
-    delete(id) {
-        return instance.delete(`/predictions/${id}/`);
-    }
+  updatePrediction(id, data) {
+    return http.put(`/predictions/${id}`, data);
+  }
 
+  deletePrediction(id) {
+    return http.delete(`/predictions/${id}`);
+  }
 }
 
-export default new PredictYieldService();
+// Fix: Assign instance to a variable before exporting
+const predictYieldService = new PredictYieldService();
+export default predictYieldService;
