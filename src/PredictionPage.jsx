@@ -8,10 +8,7 @@ import RemoteSensingMap from './gis/components/RemoteSensingMap';
 
 const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
-const items = new Array(3).fill(null).map((_, index) => ({
-    key: String(index + 1),
-    label: `nav ${index + 1}`,
-}));
+
 const PredictionPage = () => {
     const {
         token: { colorBgContainer, borderRadiusLG, colorPrimary },
@@ -27,9 +24,29 @@ const PredictionPage = () => {
         temperature: 25,
         rainfall: 890,
         pesticide: 2000,
-        country: '134',
-        item: '13',
+        country: '134', // Default to Zimbabwe
+        item: '13', // Default to Maize
     });
+
+    // Country options
+    const countryOptions = [
+        { value: '134', label: 'Zimbabwe' },
+        { value: '1', label: 'United States' },
+        { value: '2', label: 'China' },
+        { value: '3', label: 'India' },
+        { value: '4', label: 'Brazil' },
+        { value: '5', label: 'South Africa' },
+    ];
+
+    // Crop type options
+    const cropOptions = [
+        { value: '13', label: 'Maize' },
+        { value: '15', label: 'Wheat' },
+        { value: '14', label: 'Rice' },
+        { value: '16', label: 'Soybeans' },
+        { value: '17', label: 'Potatoes' },
+        { value: '18', label: 'Cassava' },
+    ];
 
     const handleFormChange = (field, value) => {
         setFormData((prevFormData) => ({
@@ -39,7 +56,6 @@ const PredictionPage = () => {
     };
 
     const handleFormSubmit = async () => {
-
         try {
             setLoading(true);
             setDisabled(true);
@@ -61,18 +77,17 @@ const PredictionPage = () => {
                 message.success("Yield prediction completed successfully");
             } else {
                 console.log("Error occurred during prediction");
+                message.error("Prediction failed. Please try again.");
             }
         } catch (error) {
             message.error("Failed to perform prediction");
             console.error(error)
-        }
-        finally {
+        } finally {
             setLoading(false);
             setDisabled(false);
         }
     };
 
-    // Define the tab items using the new format
     const tabItems = [
         {
             key: '1',
@@ -102,7 +117,6 @@ const PredictionPage = () => {
                                 <Divider className="modern-divider" />
                                 <div className='row'>
                                     <div className='col col-lg-6'>
-                                        {/* Form items for the left column */}
                                         <Form.Item
                                             label={
                                                 <div className="d-flex align-items-center">
@@ -169,7 +183,6 @@ const PredictionPage = () => {
                                         </Form.Item>
                                     </div>
                                     <div className='col col-lg-6'>
-                                        {/* Form items for the right column */}
                                         <Form.Item
                                             label={
                                                 <div className="d-flex align-items-center">
@@ -185,10 +198,10 @@ const PredictionPage = () => {
                                                 size="large"
                                                 placeholder="Select country"
                                                 showSearch
+                                                optionFilterProp="label"
                                                 onChange={(value) => handleFormChange("country", value)}
-                                                options={[
-                                                    // ... existing code ...
-                                                ]}
+                                                options={countryOptions}
+                                                defaultValue="134"
                                             />
                                         </Form.Item>
 
@@ -229,9 +242,9 @@ const PredictionPage = () => {
                                                 placeholder="Select crop type"
                                                 onChange={(value) => handleFormChange("item", value)}
                                                 showSearch
-                                                options={[
-                                                    // ... existing code ...
-                                                ]}
+                                                optionFilterProp="label"
+                                                options={cropOptions}
+                                                defaultValue="13"
                                             />
                                         </Form.Item>
                                     </div>
@@ -344,130 +357,55 @@ const PredictionPage = () => {
                                         <span>Generate AI Prediction</span>
                                     </button>
                                 </Divider>
-                                <button
-                                    type="submit"
-                                    className="prediction-button"
-                                    disabled={disabled}
-                                >
-                                    {loading ? (
-                                        <Spin size="small" className="me-2" />
-                                    ) : (
-                                        <Brain size={20} className="me-2" />
-                                    )}
-                                    <span>Generate AI Prediction</span>
-                                </button>
+                                
+                                {/* Prediction Results Section */}
+                                <Form layout="vertical"> 
+                                    <fieldset> 
+                                        <legend className="text-bold"> 
+                                            <h4>Prediction Results</h4> 
+                                        </legend> 
+                                        
+                                        {loading ? ( 
+                                            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "300px" }}> 
+                                                <Spin size="large" /> 
+                                            </div> 
+                                        ) : ( 
+                                            predictionResult === null && ( 
+                                                <Card> 
+                                                    <div className="d-flex justify-content-center align-items-center"> 
+                                                        <div className="text-center mt-1"> 
+                                                            <Empty description={true} /> 
+                                                            <p className="lead mt-4 mb-0"> 
+                                                                No predicted results 
+                                                            </p> 
+                                                            <p className="fw-light mt-1 mb-0"> 
+                                                                Please fill in all details above to perform prediction 
+                                                            </p> 
+                                                        </div> 
+                                                    </div> 
+                                                </Card> 
+                                            )
+                                        )} 
+                                        
+                                        {predictionResult && ( 
+                                            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "350px" }}> 
+                                                <Card className='w-75 py-2'> 
+                                                    <Form.Item label="Predicted yield"> 
+                                                        <Input className='w-100 pt-2' size="large" value={predictionResult?.crop_yield} /> 
+                                                    </Form.Item> 
+                                                </Card> 
+                                            </div> 
+                                        )} 
+                                    </fieldset> 
+                                </Form>
+                                
+                                {/* Remove the duplicate button that was here */}
+                                
                             </Form>
                         </fieldset>
                     </div>
-
-                    {/* Show prediction results only if available */}
-                    <div className='mt-5'>
-                        {loading === true && (
-                            <div className="loading-container">
-                                <Spin size="large" />
-                                <p className="mt-3">AI is analyzing your data...</p>
-                            </div>
-                        )}
-                        
-                        {predictionResult && !loading && (
-                            <div className="prediction-result-container">
-                                <h3 className="mb-4">
-                                    <div className="d-flex align-items-center">
-                                        <Leaf size={24} className="me-2" />
-                                        <span>Prediction Results</span>
-                                    </div>
-                                </h3>
-                                
-                                <div className="row">
-                                    <div className="col-md-6">
-                                        <Card className="prediction-card">
-                                            <h4 className="prediction-value">
-                                                {predictionResult.yield_prediction} 
-                                                <span className="prediction-unit">tonnes/hectare</span>
-                                            </h4>
-                                            <p className="prediction-label">Predicted Yield</p>
-                                            
-                                            <div className="prediction-comparison">
-                                                <div className="comparison-item">
-                                                    <span className="comparison-label">vs. Last Year</span>
-                                                    <span className="comparison-value positive">+12.5%</span>
-                                                </div>
-                                                <div className="comparison-item">
-                                                    <span className="comparison-label">vs. 5-Year Average</span>
-                                                    <span className="comparison-value positive">+8.3%</span>
-                                                </div>
-                                            </div>
-                                        </Card>
-                                    </div>
-                                    
-                                    <div className="col-md-6">
-                                        <Card className="factors-card">
-                                            <h5 className="mb-3">Key Influencing Factors</h5>
-                                            <ul className="factors-list">
-                                                <li>
-                                                    <div className="factor-item">
-                                                        <div className="factor-name">Temperature</div>
-                                                        <div className="factor-impact positive">Positive Impact</div>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div className="factor-item">
-                                                        <div className="factor-name">Rainfall</div>
-                                                        <div className="factor-impact positive">Positive Impact</div>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div className="factor-item">
-                                                        <div className="factor-name">Pesticide Usage</div>
-                                                        <div className="factor-impact neutral">Neutral Impact</div>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div className="factor-item">
-                                                        <div className="factor-name">Soil Health</div>
-                                                        <div className="factor-impact negative">Negative Impact</div>
-                                                    </div>
-                                                </li>
-                                            </ul>
-                                        </Card>
-                                    </div>
-                                </div>
-                                
-                                <div className="row mt-4">
-                                    <div className="col-md-12">
-                                        <Card className="recommendations-card">
-                                            <h5 className="mb-3">AI Recommendations</h5>
-                                            <div className="recommendations-list">
-                                                <div className="recommendation-item">
-                                                    <div className="recommendation-icon">💧</div>
-                                                    <div className="recommendation-content">
-                                                        <h6>Optimize Irrigation</h6>
-                                                        <p>Consider implementing drip irrigation to improve water efficiency by up to 30%.</p>
-                                                    </div>
-                                                </div>
-                                                <div className="recommendation-item">
-                                                    <div className="recommendation-icon">🌱</div>
-                                                    <div className="recommendation-content">
-                                                        <h6>Crop Rotation</h6>
-                                                        <p>Implement a 3-year crop rotation cycle to improve soil health and reduce pest pressure.</p>
-                                                    </div>
-                                                </div>
-                                                <div className="recommendation-item">
-                                                    <div className="recommendation-icon">🧪</div>
-                                                    <div className="recommendation-content">
-                                                        <h6>Soil Testing</h6>
-                                                        <p>Conduct comprehensive soil testing to optimize fertilizer application based on specific nutrient needs.</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </Card>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                    </div>
                 </>
-            )
+            ),
         },
         {
             key: '2',
@@ -540,7 +478,7 @@ const PredictionPage = () => {
                 <div className="container">
                     <div className="row">
                         <div className="col-md-6">
-                            <p className="mb-0">© 2023 Crop Yield Prediction System</p>
+                            <p className="mb-0">© {new Date().getFullYear()} Crop Yield Prediction System</p>
                         </div>
                         <div className="col-md-6 text-end">
                             <p className="mb-0">Powered by AI & Remote Sensing</p>

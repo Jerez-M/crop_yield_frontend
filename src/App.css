@@ -1066,4 +1066,280 @@ img {
   .footer-bottom {
     text-align: center;
   }
+}/* Modern Form Styles */
+.modern-form-group {
+  margin-bottom: 1.5rem;
 }
+
+.modern-label {
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: #2d3748;
+}
+
+.modern-input, .modern-select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.modern-input:focus, .modern-select:focus {
+  border-color: #57b83b;
+  box-shadow: 0 0 0 3px rgba(87, 184, 59, 0.2);
+  outline: none;
+}
+
+.input-with-addon {
+  display: flex;
+  align-items: center;
+}
+
+.input-addon-before, .input-addon-after {
+  background: #f7fafc;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e2e8f0;
+  color: #4a5568;
+  font-size: 0.9rem;
+}
+
+.input-addon-before {
+  border-radius: 8px 0 0 8px;
+  border-right: none;
+}
+
+.input-addon-after {
+  border-radius: 0 8px 8px 0;
+  border-left: none;
+}
+
+.input-with-addon .modern-input {
+  border-radius: 0;
+}
+
+.form-text {
+  font-size: 0.85rem;
+  color: #718096;
+  margin-top: 0.25rem;
+}
+
+.required {
+  color: #e53e3e;
+  margin-left: 0.25rem;
+}
+
+.modern-breadcrumb {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.5rem;
+}
+
+.modern-breadcrumb li {
+  display: flex;
+  align-items: center;
+}
+
+.modern-breadcrumb li:not(:last-child)::after {
+  content: '/';
+  margin: 0 0.5rem;
+  color: #a0aec0;
+}
+
+.modern-breadcrumb a {
+  color: #4a5568;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.modern-breadcrumb a:hover {
+  color: #57b83b;
+}
+
+.modern-breadcrumb li:last-child span {
+  color: #718096;
+}
+
+.modern-divider {
+  border: none;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.05);
+  margin: 1.5rem 0;
+}
+
+.modern-legend {
+  padding: 0 0.5rem;
+}
+
+.modern-legend h4 {
+  margin: 0;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.modern-alert {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.modern-alert.info {
+  background: rgba(66, 153, 225, 0.1);
+  color: #2b6cb0;
+}
+
+.modern-alert svg {
+  margin-right: 0.75rem;
+}
+
+.close-alert {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: 1.25rem;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.close-alert:hover {
+  opacity: 1;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 0.8s linear infinite;
+}
+
+.spinner-large {
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(87, 184, 59, 0.2);
+  border-radius: 50%;
+  border-top-color: #57b83b;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  text-align: center;
+}
+
+.empty-icon {
+  color: #cbd5e0;
+  margin-bottom: 1.5rem;
+}
+
+.empty-state h3 {
+  margin: 0 0 0.5rem;
+  color: #2d3748;
+  font-weight: 600;
+}
+
+.empty-state p {
+  color: #718096;
+  margin: 0;
+}
+
+.modern-message {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  transform: translateX(120%);
+  transition: transform 0.3s ease;
+}
+
+.modern-message.show {
+  transform: translateX(0);
+}
+
+.modern-message.success {
+  background: #57b83b;
+  color: white;
+}
+
+.modern-message.error {
+  background: #e53e3e;
+  color: white;
+}
+
+.message-content {
+  display: flex;
+  align-items: center;
+}
+
+.message-icon {
+  margin-right: 0.75rem;
+  font-weight: bold;
+}
+
+/* Remote Sensing Styles */
+.remote-sensing-container {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f8fafc;
+}
+
+.remote-sensing-info {
+  padding: 1rem;
+}
+
+.ndvi-legend {
+  margin-top: 1rem;
+}
+
+.ndvi-scale {
+  display: flex;
+  height: 20px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.ndvi-color {
+  flex: 1;
+}
+
+.ndvi-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: #4a5568;
+  margin-top: 0.25rem;
+}
+
+
