@@ -1,35 +1,52 @@
 import React, { useState } from 'react';
-import { Alert, Breadcrumb, Button, Card, DatePicker, Divider, Empty, Form, Input, InputNumber, Layout, Menu, Select, Spin, message, theme } from 'antd';
+import { Alert, Card, DatePicker, Divider, Empty, Form, InputNumber, Layout, Select, Spin, message, theme, Tabs } from 'antd';
 import "./App.css";
-import { FaBackward } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import { TiArrowLeftOutline } from 'react-icons/ti';
-import { IoGitPullRequestOutline } from 'react-icons/io5';
+import { ArrowLeft, BarChart3, Beaker, Brain, CloudRain, Droplets, Leaf, Microscope, Satellite, Sprout, Target, Thermometer } from 'lucide-react';
 import predictYieldService from './services/predict-yield.service';
-
+import RemoteSensingMap from './gis/components/RemoteSensingMap';
 
 const { Header, Content, Footer } = Layout;
-const items = new Array(3).fill(null).map((_, index) => ({
-    key: String(index + 1),
-    label: `nav ${index + 1}`,
-}));
+const { TabPane } = Tabs;
+
 const PredictionPage = () => {
     const {
-        token: { colorBgContainer, borderRadiusLG },
+        token: { colorBgContainer, borderRadiusLG, colorPrimary },
     } = theme.useToken();
     const navigate = useNavigate()
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
     const [disabled, setDisabled] = useState(false);
     const [predictionResult, setPredictionResult] = useState(null);
+    const [activeTab, setActiveTab] = useState('1');
     const [formData, setFormData] = useState({
         year: null,
         temperature: 25,
         rainfall: 890,
         pesticide: 2000,
-        country: '134',
-        item: '13',
+        country: '134', // Default to Zimbabwe
+        item: '13', // Default to Maize
     });
+
+    // Country options
+    const countryOptions = [
+        { value: '134', label: 'Zimbabwe' },
+        { value: '1', label: 'United States' },
+        { value: '2', label: 'China' },
+        { value: '3', label: 'India' },
+        { value: '4', label: 'Brazil' },
+        { value: '5', label: 'South Africa' },
+    ];
+
+    // Crop type options
+    const cropOptions = [
+        { value: '13', label: 'Maize' },
+        { value: '15', label: 'Wheat' },
+        { value: '14', label: 'Rice' },
+        { value: '16', label: 'Soybeans' },
+        { value: '17', label: 'Potatoes' },
+        { value: '18', label: 'Cassava' },
+    ];
 
     const handleFormChange = (field, value) => {
         setFormData((prevFormData) => ({
@@ -39,7 +56,6 @@ const PredictionPage = () => {
     };
 
     const handleFormSubmit = async () => {
-
         try {
             setLoading(true);
             setDisabled(true);
@@ -61,90 +77,59 @@ const PredictionPage = () => {
                 message.success("Yield prediction completed successfully");
             } else {
                 console.log("Error occurred during prediction");
+                message.error("Prediction failed. Please try again.");
             }
         } catch (error) {
             message.error("Failed to perform prediction");
             console.error(error)
-        }
-        finally {
+        } finally {
             setLoading(false);
             setDisabled(false);
         }
     };
 
-    return (
-        <Layout>
-            <Header
-                style={{
-                    position: 'sticky',
-                    top: 0,
-                    zIndex: 1,
-                    width: '100%',
-                    // display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                }}
-            >
-
-                <div className='d-flex justify-content-between align-items-center mt-2'>
-                    <h3 className='text-white'>Maize Yield Prediction</h3>
-                    <Button
-                        icon={<TiArrowLeftOutline />}
-                        className='border-0 text-light'
-                        style={{ background: '#39b54a' }}
-                        onClick={() => navigate('/')}
-                    >
-                        Back home
-                    </Button>
-                </div>
-            </Header>
-            <Content
-                style={{
-                    padding: '0 48px',
-                }}
-            >
-                <Breadcrumb
-                    style={{
-                        margin: '16px 0',
-                    }}
-                >
-                    <Breadcrumb.Item>Home</Breadcrumb.Item>
-                    <Breadcrumb.Item>Maize yield prediction</Breadcrumb.Item>
-                    <Breadcrumb.Item>Predict</Breadcrumb.Item>
-                </Breadcrumb>
-                <div
-                    style={{
-                        padding: 24,
-                        minHeight: 380,
-                        background: colorBgContainer,
-                        borderRadius: borderRadiusLG,
-                    }}
-                >
+    const tabItems = [
+        {
+            key: '1',
+            label: (
+                <span className="tab-label">
+                    <Beaker size={18} className="me-2" />
+                    Manual Input
+                </span>
+            ),
+            children: (
+                <>
                     <div className="mb-5">
                         <Alert
-                            message={`Please enter the details below to perform yield prediction.`}
+                            message={`Enter the details below to generate an AI-powered yield prediction`}
                             type="info"
-                            className="mb-2 py-2"
+                            className="modern-alert mb-4 py-3"
                             showIcon
                             closable
                         />
 
-                        <fieldset>
-                            <legend className="text-bold">
-                                <h4>Prediction Data</h4>
+                        <fieldset className="modern-fieldset">
+                            <legend className="modern-legend">
+                                <Beaker size={20} className="me-2" />
+                                <h4 className="mb-0">Prediction Parameters</h4>
                             </legend>
-                            <Form layout="vertical" form={form} onFinish={handleFormSubmit}>
-                                <Divider type="horizontal" />
+                            <Form layout="vertical" form={form} onFinish={handleFormSubmit} className="modern-form">
+                                <Divider className="modern-divider" />
                                 <div className='row'>
                                     <div className='col col-lg-6'>
                                         <Form.Item
-                                            label="Year to predict"
+                                            label={
+                                                <div className="d-flex align-items-center">
+                                                    <BarChart3 size={18} className="me-2" />
+                                                    <span>Year to predict</span>
+                                                </div>
+                                            }
                                             name="year"
                                             rules={[{ required: true, message: "Year is required!" }]}
                                         >
                                             <DatePicker
                                                 picker="year"
-                                                className="w-100"
+                                                className="modern-input w-100"
                                                 size="large"
                                                 onChange={(date, dateString) => {
                                                     handleFormChange("year", dateString);
@@ -153,234 +138,356 @@ const PredictionPage = () => {
                                         </Form.Item>
 
                                         <Form.Item
-                                            label="Temperature"
+                                            label={
+                                                <div className="d-flex align-items-center">
+                                                    <Thermometer size={18} className="me-2" />
+                                                    <span>Temperature</span>
+                                                </div>
+                                            }
                                             name="temperature"
-                                            rules={[{ required: true, message: "temperature is required!" }]}
-                                            help="Temperature should be the average temperature per year"
+                                            rules={[{ required: true, message: "Temperature is required!" }]}
+                                            help="Average temperature per year"
                                         >
                                             <InputNumber
-                                                className="w-100 mt-1"
+                                                className="modern-input w-100"
                                                 size="large"
                                                 addonBefore="+"
-                                                addonAfter="Degrees"
+                                                addonAfter="°C"
                                                 min={1}
                                                 max={100}
-                                                placeholder='eg. 25'
+                                                placeholder='e.g., 25'
                                                 onChange={(value) => handleFormChange('temperature', value)} />
                                         </Form.Item>
+                                        
                                         <Form.Item
-                                            className="w-100 mt-2"
-                                            label="Rainfall"
+                                            className="w-100"
+                                            label={
+                                                <div className="d-flex align-items-center">
+                                                    <CloudRain size={18} className="me-2" />
+                                                    <span>Rainfall</span>
+                                                </div>
+                                            }
                                             name="rainfall"
-                                            rules={[{ required: true, message: "rainfall is required!" }]}
-                                            help="Rainfall should be the average rainfall per year"
+                                            rules={[{ required: true, message: "Rainfall is required!" }]}
+                                            help="Average rainfall per year"
                                         >
                                             <InputNumber
-                                                className="w-100"
+                                                className="modern-input w-100"
                                                 size="large"
                                                 addonBefore="+"
                                                 addonAfter="MM"
                                                 min={1}
                                                 max={10000}
-                                                placeholder='eg. 780'
+                                                placeholder='e.g., 780'
                                                 onChange={(value) => handleFormChange('rainfall', value)} />
                                         </Form.Item>
                                     </div>
                                     <div className='col col-lg-6'>
                                         <Form.Item
-                                            label="Country"
+                                            label={
+                                                <div className="d-flex align-items-center">
+                                                    <Droplets size={18} className="me-2" />
+                                                    <span>Country</span>
+                                                </div>
+                                            }
                                             name="country"
                                             rules={[{ required: true, message: "Country is required!" }]}
                                         >
                                             <Select
-                                                className="w-100"
+                                                className="modern-select w-100"
                                                 size="large"
                                                 placeholder="Select country"
                                                 showSearch
+                                                optionFilterProp="label"
                                                 onChange={(value) => handleFormChange("country", value)}
-                                                options={[
-                                                    { label: "Zimbabwe", value: "134" },
-                                                    { label: "South Africa", value: "130" },
-                                                    { label: "Zambia", value: "125" },
-                                                    { label: "Kenya", value: "120" },
-                                                    { label: "Nigeria", value: "115" },
-                                                    { label: "Ethiopia", value: "110" },
-                                                    { label: "Tanzania", value: "105" },
-                                                    { label: "Uganda", value: "100" },
-                                                    { label: "Ghana", value: "95" },
-                                                    { label: "Egypt", value: "90" },
-                                                    { label: "Morocco", value: "85" },
-                                                    { label: "Algeria", value: "80" },
-                                                    { label: "Sudan", value: "75" },
-                                                    { label: "Angola", value: "70" },
-                                                    { label: "Mozambique", value: "65" },
-                                                    { label: "Cameroon", value: "60" },
-                                                    { label: "Ivory Coast", value: "55" },
-                                                    { label: "Madagascar", value: "50" },
-                                                    { label: "Niger", value: "45" },
-                                                    { label: "Burkina Faso", value: "40" },
-                                                    { label: "Mali", value: "35" },
-                                                    { label: "Malawi", value: "30" },
-                                                    { label: "Zimbabwe", value: "25" },
-                                                    { label: "Chad", value: "20" },
-                                                    { label: "Guinea", value: "15" },
-                                                    { label: "Rwanda", value: "10" },
-                                                    { label: "Benin", value: "5" },
-                                                    { label: "Tunisia", value: "4" },
-                                                    { label: "Burundi", value: "3" },
-                                                    { label: "South Sudan", value: "2" },
-                                                    { label: "Sierra Leone", value: "1" },
-                                                    { label: "United States", value: "200" },
-                                                    { label: "Canada", value: "201" },
-                                                    { label: "Mexico", value: "202" },
-                                                    { label: "Brazil", value: "203" },
-                                                    { label: "Argentina", value: "204" },
-                                                    { label: "Colombia", value: "205" },
-                                                    { label: "Peru", value: "206" },
-                                                    { label: "Venezuela", value: "207" },
-                                                    { label: "Chile", value: "208" },
-                                                    { label: "China", value: "300" },
-                                                    { label: "India", value: "301" },
-                                                    { label: "Indonesia", value: "302" },
-                                                    { label: "Pakistan", value: "303" },
-                                                    { label: "Bangladesh", value: "304" },
-                                                    { label: "Japan", value: "305" },
-                                                    { label: "Philippines", value: "306" },
-                                                    { label: "Vietnam", value: "307" },
-                                                    { label: "Turkey", value: "308" },
-                                                    { label: "United Kingdom", value: "400" },
-                                                    { label: "Germany", value: "401" },
-                                                    { label: "France", value: "402" },
-                                                    { label: "Italy", value: "403" },
-                                                    { label: "Spain", value: "404" },
-                                                    { label: "Netherlands", value: "405" },
-                                                    { label: "Switzerland", value: "406" },
-                                                    { label: "Sweden", value: "407" },
-                                                    { label: "Poland", value: "408" },
-                                                ]}
+                                                options={countryOptions}
+                                                defaultValue="134"
                                             />
                                         </Form.Item>
 
                                         <Form.Item
-                                            label="Pesticide"
+                                            label={
+                                                <div className="d-flex align-items-center">
+                                                    <Microscope size={18} className="me-2" />
+                                                    <span>Pesticide</span>
+                                                </div>
+                                            }
                                             name="pesticide"
-                                            rules={[{ required: true, message: "pesticide is required!" }]}
-                                            help="Pesticide should be the average pesticide per year"
+                                            rules={[{ required: true, message: "Pesticide is required!" }]}
+                                            help="Average pesticide per year"
                                         >
                                             <InputNumber
-                                                className="w-100 mt-2"
+                                                className="modern-input w-100"
                                                 size="large"
                                                 addonBefore="+"
                                                 addonAfter="Tonnes"
                                                 min={1} max={10000}
-                                                placeholder='eg. 2000'
+                                                placeholder='e.g., 2000'
                                                 onChange={(value) => handleFormChange('pesticide', value)} />
                                         </Form.Item>
 
                                         <Form.Item
-                                            label="Crop type"
+                                            label={
+                                                <div className="d-flex align-items-center">
+                                                    <Sprout size={18} className="me-2" />
+                                                    <span>Crop type</span>
+                                                </div>
+                                            }
                                             name="item"
                                             rules={[{ required: true, message: "Crop type is required!" }]}
                                         >
                                             <Select
-                                                className="w-100"
+                                                className="modern-select w-100"
                                                 size="large"
                                                 placeholder="Select crop type"
                                                 onChange={(value) => handleFormChange("item", value)}
                                                 showSearch
-                                                options={[
-                                                    { label: "Maize", value: "13" },
-                                                    { label: "Barley", value: "12" },
-                                                    { label: "Wheat", value: "11" },
-                                                    { label: "Rice", value: "10" },
-                                                    { label: "Soybeans", value: "9" },
-                                                    { label: "Cotton", value: "8" },
-                                                    { label: "Potatoes", value: "7" },
-                                                    { label: "Tomatoes", value: "6" },
-                                                    { label: "Sugar cane", value: "5" },
-                                                    { label: "Coffee", value: "4" },
-                                                    { label: "Bananas", value: "3" },
-                                                ]}
+                                                optionFilterProp="label"
+                                                options={cropOptions}
+                                                defaultValue="13"
                                             />
                                         </Form.Item>
-
                                     </div>
-
                                 </div>
-                                <Divider type="horizontal" />
-                                <Button
-                                    type="primary"
-                                    size="large"
-                                    className="mt-3"
-                                    loading={loading}
-                                    disabled={disabled}
-                                    icon={<IoGitPullRequestOutline />}
-                                    block
-                                    htmlType="submit"
-                                >
-                                    Predict
-                                </Button>
-                            </Form>
-                        </fieldset>
-
-                    </div>
-
-                    <div className='mt-1'>
-                        {loading === true && (
-                            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "300px" }}>
-                                <Spin size="large" />
-                            </div>
-                        )}
-
-                        <Form layout="vertical">
-                            <fieldset>
-                                <legend className="text-bold">
-                                    <h4>Prediction Results</h4>
-                                </legend>
-
-                                {loading ? (
-                                    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "300px" }}>
-                                        <Spin size="large" />
+                                
+                                {/* Remote Sensing Section */}
+                                <Divider className="modern-divider">
+                                    <div className="d-flex align-items-center">
+                                        <Satellite size={18} className="me-2" />
+                                        <span>Remote Sensing Data</span>
                                     </div>
-                                ) : (
-                                    predictionResult === null && (
-                                        <Card>
-                                            <div className="d-flex justify-content-center align-items-center">
-                                                <div className="text-center mt-1">
-                                                    <Empty description={true} />
-                                                    <p className="lead mt-4 mb-0">
-                                                        No predicted results
+                                </Divider>
+                                
+                                <div className="remote-sensing-container">
+                                    <div className="row">
+                                        <div className="col-md-4">
+                                            <Card className="location-selection-card">
+                                                <h5 className="mb-3">
+                                                    <div className="d-flex align-items-center">
+                                                        <Target size={18} className="me-2" />
+                                                        <span>Location Selection</span>
+                                                    </div>
+                                                </h5>
+                                                <p className="text-muted mb-4">Select a location on the map or enter coordinates to analyze vegetation health.</p>
+                                                
+                                                <Form.Item
+                                                    label="Latitude"
+                                                    name="latitude"
+                                                >
+                                                    <InputNumber 
+                                                        className="modern-input w-100"
+                                                        placeholder="e.g., -17.824858"
+                                                        min={-90}
+                                                        max={90}
+                                                        precision={6}
+                                                    />
+                                                </Form.Item>
+                                                
+                                                <Form.Item
+                                                    label="Longitude"
+                                                    name="longitude"
+                                                >
+                                                    <InputNumber 
+                                                        className="modern-input w-100"
+                                                        placeholder="e.g., 31.053028"
+                                                        min={-180}
+                                                        max={180}
+                                                        precision={6}
+                                                    />
+                                                </Form.Item>
+                                                
+                                                <div className="ndvi-info">
+                                                    <h6>NDVI Analysis</h6>
+                                                    <p className="text-muted small">
+                                                        Normalized Difference Vegetation Index (NDVI) measures vegetation health and density.
                                                     </p>
-                                                    <p className="fw-light mt-1 mb-0">
-                                                        Please fill in all details above to perform prediction
-                                                    </p>
+                                                    
+                                                    <div className="ndvi-scale">
+                                                        <div className="ndvi-gradient"></div>
+                                                        <div className="ndvi-labels">
+                                                            <span>Low</span>
+                                                            <span>Moderate</span>
+                                                            <span>High</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </Card>
+                                        </div>
+                                        
+                                        <div className="col-md-8">
+                                            <div className="remote-sensing-map-container">
+                                                <RemoteSensingMap />
+                                            </div>
+                                            
+                                            <div className="row mt-3">
+                                                <div className="col-md-12">
+                                                    <Card className="ndvi-analysis-card">
+                                                        <div className="ndvi-stats">
+                                                            <div className="stat-item">
+                                                                <span className="stat-label">Current NDVI</span>
+                                                                <span className="stat-value positive">0.72</span>
+                                                            </div>
+                                                            <div className="stat-item">
+                                                                <span className="stat-label">Historical Average</span>
+                                                                <span className="stat-value">0.65</span>
+                                                            </div>
+                                                            <div className="stat-item">
+                                                                <span className="stat-label">Vegetation Health</span>
+                                                                <span className="stat-value positive">Good</span>
+                                                            </div>
+                                                        </div>
+                                                    </Card>
                                                 </div>
                                             </div>
-                                        </Card>
-                                    ))}
-
-                                {predictionResult && (
-                                    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "350px" }}>
-                                        <Card className='w-75 py-2'>
-                                            <Form.Item label="Predicted yield">
-                                                <Input className='w-100 pt-2' size="large" value={predictionResult?.crop_yield} />
-                                            </Form.Item>
-                                        </Card>
+                                        </div>
                                     </div>
-                                )}
-                            </fieldset>
-                        </Form>
+                                </div>
+                                
+                                <Divider className="modern-divider">
+                                    <button
+                                        type="submit"
+                                        className="prediction-button"
+                                        disabled={disabled}
+                                    >
+                                        {loading ? (
+                                            <Spin size="small" className="me-2" />
+                                        ) : (
+                                            <Brain size={20} className="me-2" />
+                                        )}
+                                        <span>Generate AI Prediction</span>
+                                    </button>
+                                </Divider>
+                                
+                                {/* Prediction Results Section */}
+                                <Form layout="vertical"> 
+                                    <fieldset> 
+                                        <legend className="text-bold"> 
+                                            <h4>Prediction Results</h4> 
+                                        </legend> 
+                                        
+                                        {loading ? ( 
+                                            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "300px" }}> 
+                                                <Spin size="large" /> 
+                                            </div> 
+                                        ) : ( 
+                                            predictionResult === null && ( 
+                                                <Card> 
+                                                    <div className="d-flex justify-content-center align-items-center"> 
+                                                        <div className="text-center mt-1"> 
+                                                            <Empty description={true} /> 
+                                                            <p className="lead mt-4 mb-0"> 
+                                                                No predicted results 
+                                                            </p> 
+                                                            <p className="fw-light mt-1 mb-0"> 
+                                                                Please fill in all details above to perform prediction 
+                                                            </p> 
+                                                        </div> 
+                                                    </div> 
+                                                </Card> 
+                                            )
+                                        )} 
+                                        
+                                        {predictionResult && ( 
+                                            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "350px" }}> 
+                                                <Card className='w-75 py-2'> 
+                                                    <Form.Item label="Predicted yield"> 
+                                                        <Input className='w-100 pt-2' size="large" value={predictionResult?.crop_yield} /> 
+                                                    </Form.Item> 
+                                                </Card> 
+                                            </div> 
+                                        )} 
+                                    </fieldset> 
+                                </Form>
+                                
+                                {/* Remove the duplicate button that was here */}
+                                
+                            </Form>
+                        </fieldset>
+                    </div>
+                </>
+            ),
+        },
+        {
+            key: '2',
+            label: (
+                <span className="tab-label">
+                    <Satellite size={18} className="me-2" />
+                    NDVI Analysis
+                </span>
+            ),
+            children: (
+                <div className="ndvi-tab-content">
+                    <Alert
+                        message="NDVI (Normalized Difference Vegetation Index) Analysis"
+                        description="Use satellite imagery to analyze vegetation health and predict crop yields based on historical NDVI data."
+                        type="info"
+                        className="modern-alert mb-4"
+                        showIcon
+                    />
+                    
+                    <div className="row">
+                        <div className="col-md-12">
+                            <Card className="ndvi-map-card">
+                                <RemoteSensingMap fullSize={true} />
+                            </Card>
+                        </div>
                     </div>
                 </div>
+            )
+        }
+    ];
+
+    return (
+        <Layout className="layout">
+            <Header className="modern-navbar">
+                <div className="container">
+                    <div className="navbar-content">
+                        <div className="lamp-header">
+                            <span className="lamp-light"></span>
+                            <span className="lamp-text">CROP YIELD PREDICTION</span>
+                        </div>
+                        <button 
+                            className="moving-border-button" 
+                            onClick={() => navigate(-1)}
+                        >
+                            <span className="lamp-light"></span>
+                            <span>Back</span>
+                            <ArrowLeft size={20} className="ms-2" />
+                        </button>
+                    </div>
+                </div>
+            </Header>
+            <Content className="site-layout">
+                <div
+                    className="site-layout-content"
+                    style={{
+                        background: colorBgContainer,
+                        borderRadius: borderRadiusLG,
+                    }}
+                >
+                    <Tabs
+                        defaultActiveKey="1"
+                        activeKey={activeTab}
+                        onChange={(key) => setActiveTab(key)}
+                        items={tabItems}
+                        className="modern-tabs"
+                    />
+                </div>
             </Content>
-            <Footer
-                style={{
-                    textAlign: 'center',
-                }}
-            >
-                Maize prediction ©{new Date().getFullYear()} Created by Jeremiah Muchazondida
+            <Footer className="footer">
+                <div className="container">
+                    <div className="row">
+                        <div className="col-md-6">
+                            <p className="mb-0">© {new Date().getFullYear()} Crop Yield Prediction System</p>
+                        </div>
+                        <div className="col-md-6 text-end">
+                            <p className="mb-0">Powered by AI & Remote Sensing</p>
+                        </div>
+                    </div>
+                </div>
             </Footer>
-        </Layout >
+        </Layout>
     );
 };
+
 export default PredictionPage;

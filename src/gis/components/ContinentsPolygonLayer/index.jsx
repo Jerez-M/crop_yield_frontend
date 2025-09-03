@@ -1,5 +1,5 @@
 import React from 'react';
-import { GeoJSON, LayersControl, Tooltip } from 'react-leaflet';
+import { GeoJSON, LayersControl } from 'react-leaflet';
 
 const ContinentsPolygonLayer = ({data, setGeoFilter, getGeoFilter}) => {
   const geoFilter = getGeoFilter();
